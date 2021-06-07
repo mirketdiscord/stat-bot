@@ -17,12 +17,14 @@ class manager():
         self.cursor.execute(query)
         self.connect.commit()
 
-    def __connect(self, filepath:str):
+    def __otherConnect(self, filepath:str):
+        # __connectDatabase() için özel yazdım.
         self.connect = s3.connect(filepath)
         self.cursor = self.connect.cursor()
         self.connect.commit()        
 
     def __connectDatabase(self):
+        # Ana komutlar
         filepath = os.getcwd() + "/db/guild/" + self.guildId + "mirket.db"
 
         if os.path.isfile(filepath) == False:
@@ -40,13 +42,13 @@ class manager():
             self.__firstConnect(
                 filepath, "CREATE TABLE IF NOT EXISTS VOICE (channel TEXT, channel_status TEXT, member TEXT, m_id TEXT, m_desktop_status TEXT, m_mobile_status TEXT, m_raw_status TEXT, time TEXT)")
 
-        self.__connect(filepath)
+        self.__otherConnect(filepath)
 
     def getGuildStatus(self):
-        """Kullanıcıların sunucuya ne zaman girip çıktılarının bilgisini döndürür
+        """Kullanıcıların sunucuya ne zaman girip çıktılarının bilgisini döndürür.
 
         Returns:
-            List: Ekrana üyelerin giriş ve çıkış loglarını listeler.
+            List or -1: Veri olmadığında `-1`
         """
         self.cursor.execute(f"SELECT * FROM GUILDSTATUS")
         guild = self.cursor.fetchall()
@@ -56,10 +58,10 @@ class manager():
         return guild
 
     def getMember(self):
-        """Kullanıcıların sunucuya ne zaman girip çıktılarının bilgisini döndürür
+        """Tüm kullanıcıların bilgilerini döndürür.
 
         Returns:
-            List: Ekrana üyelerin giriş ve çıkış loglarını listeler.
+            List or -1: Veri olmadığında `-1`
         """
         self.cursor.execute(f"SELECT * FROM MEMBER")
         guild = self.cursor.fetchall()
@@ -67,6 +69,3 @@ class manager():
         if guild==[]:
             return -1
         return guild
-
-m = manager(713328432263725066)
-print(m.getMember())
